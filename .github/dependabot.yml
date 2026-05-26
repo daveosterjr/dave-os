@@ -1,0 +1,29 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    labels:
+      - dependencies
+      - ci
+
+  - package-ecosystem: npm
+    directory: /templates/next-saas
+    schedule:
+      interval: weekly
+    labels:
+      - dependencies
+      - template
+    groups:
+      next-template:
+        patterns:
+          - next
+          - react
+          - react-dom
+          - eslint-config-next
+          - '@types/react*'
+      prisma:
+        patterns:
+          - prisma
+          - '@prisma/client'

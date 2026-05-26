@@ -35,6 +35,8 @@ Options:
   --idea <text>           Natural-language product idea to scaffold docs and plans
   --from-prompt           Treat positional text as the product idea and infer the project name
   --prompt-file <path>    Read product idea from a file
+  --no-env                Do not create .env.local from .env.example
+  --git                   Initialize a git repository on main
   --dry-run               Print files without writing
   --force                 Allow writing into a non-empty directory
   --install               Run npm install after creation
@@ -45,8 +47,10 @@ Options:
 function parseArgs(argv) {
   const options = {
     template: 'next-saas',
+    env: true,
     dryRun: false,
     force: false,
+    git: false,
     install: false
   };
   const positional = [];
@@ -57,8 +61,12 @@ function parseArgs(argv) {
       options.help = true;
     } else if (arg === '--dry-run') {
       options.dryRun = true;
+    } else if (arg === '--no-env') {
+      options.env = false;
     } else if (arg === '--force') {
       options.force = true;
+    } else if (arg === '--git' || arg === '--init-git') {
+      options.git = true;
     } else if (arg === '--install') {
       options.install = true;
     } else if (arg === '--template') {
@@ -435,25 +443,82 @@ function createApp(options) {
     writeIdeaArtifacts(targetDir, ideaPlan);
   }
 
+  const createdEnv = options.env && copyEnvFile(targetDir, options.force);
+
   console.log(`Created ${appTitle} at ${targetDir}`);
-  console.log('');
-  console.log('Next steps:');
-  console.log(`  cd ${path.relative(process.cwd(), targetDir) || '.'}`);
-  console.log('  cp .env.example .env.local');
-  console.log('  npm install');
-  console.log('  npm run db:start');
-  console.log('  npm run dev');
 
   if (options.install) {
     console.log('');
     console.log('Running npm install...');
-    const result = spawnSync('npm', ['install'], {
-      cwd: targetDir,
-      stdio: 'inherit'
-    });
-    if (result.status !== 0) {
-      process.exit(result.status ?? 1);
-    }
+    runCommand('npm', ['install'], targetDir);
+  }
+
+  if (options.git) {
+    console.log('');
+    console.log('Initializing git repository...');
+    initGitRepo(targetDir);
+  }
+
+  printNextSteps({
+    targetDir,
+    createdEnv,
+    installed: options.install,
+    initializedGit: options.git
+  });
+}
+
+function copyEnvFile(targetDir, force) {
+  const source = path.join(targetDir, '.env.example');
+  const destination = path.join(targetDir, '.env.local');
+  if (!fs.existsSync(source)) return false;
+  if (fs.existsSync(destination) && !force) return false;
+  fs.copyFileSync(source, destination);
+  return true;
+}
+
+function initGitRepo(targetDir) {
+  const result = spawnSync('git', ['init', '-b', 'main'], {
+    cwd: targetDir,
+    stdio: 'inherit'
+  });
+
+  if (result.status === 0) return;
+
+  runCommand('git', ['init'], targetDir);
+  runCommand('git', ['branch', '-M', 'main'], targetDir);
+}
+
+function runCommand(command, args, cwd) {
+  const result = spawnSync(command, args, {
+    cwd,
+    stdio: 'inherit'
+  });
+  if (result.status !== 0) {
+    process.exit(result.status ?? 1);
+  }
+}
+
+function printNextSteps({ targetDir, createdEnv, installed, initializedGit }) {
+  const relativeTarget = path.relative(process.cwd(), targetDir) || '.';
+  const steps = [`cd ${relativeTarget}`];
+
+  if (!createdEnv) {
+    steps.push('cp .env.example .env.local');
+  }
+  steps.push('Fill in .env.local');
+  if (!installed) {
+    steps.push('npm install');
+  }
+  steps.push('npm run db:start');
+  steps.push('npm run dev');
+  if (initializedGit) {
+    steps.push('git add -A && git commit -m "Initial app scaffold"');
+  }
+
+  console.log('');
+  console.log('Next steps:');
+  for (const step of steps) {
+    console.log(`  ${step}`);
   }
 }
 

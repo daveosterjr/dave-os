@@ -1,5 +1,7 @@
 # Dave OS
 
+[![CI](https://github.com/daveosterjr/dave-os/actions/workflows/ci.yml/badge.svg)](https://github.com/daveosterjr/dave-os/actions/workflows/ci.yml)
+
 Open-source app factory for Dave-style SaaS projects.
 
 Dave OS is a `create-react-app`-style wrapper for the modern app stack Dave keeps rebuilding. The goal is not another generic SaaS boilerplate. The goal is one opinionated, inspectable, forkable starter where auth, billing, realtime, jobs, docs, tests, API, CLI, MCP, and local dev all start with the same shape.
@@ -20,10 +22,12 @@ Dave OS is a `create-react-app`-style wrapper for the modern app stack Dave keep
 npm test
 npm run verify
 npm run factory:dry
-node bin/create-dave-app.mjs my-new-app --target-dir /tmp/my-new-app
+node bin/create-dave-app.mjs my-new-app --target-dir /tmp/my-new-app --git
 ```
 
 The first implementation is intentionally an MVP generator. It creates the right project shape and stubs the recurring systems so we can harden each subsystem once, then reuse it everywhere.
+
+By default, generated apps get `.env.local` copied from `.env.example`. Add `--install` to run `npm install`, `--git` to initialize a git repo on `main`, or `--no-env` when you want to create the env file yourself.
 
 ## Prompt-Driven Scaffolding
 
@@ -66,12 +70,14 @@ Once published:
 
 ```bash
 npm create dave-app@latest my-new-app
+npm create dave-app@latest my-new-app -- --idea "A vendor portal with realtime job status and Stripe billing" --git --install
 ```
 
 Until then, run the checked-in CLI directly:
 
 ```bash
 node bin/create-dave-app.mjs my-new-app
+node bin/create-dave-app.mjs my-new-app --idea "A customer portal with subscriptions, MCP tools, and background sync jobs" --git
 ```
 
 ## Docs
@@ -80,6 +86,7 @@ node bin/create-dave-app.mjs my-new-app
 - [Blueprint](./docs/BLUEPRINT.md)
 - [Implementation plan](./docs/IMPLEMENTATION_PLAN.md)
 - [Open-source operating model](./docs/OPEN_SOURCE.md)
+- [Release process](./docs/RELEASES.md)
 - [Roadmap](./ROADMAP.md)
 - [Changelog](./CHANGELOG.md)
 
@@ -96,6 +103,8 @@ node bin/create-dave-app.mjs my-new-app
 Dave OS is meant to be built in public. Start with [CONTRIBUTING.md](./CONTRIBUTING.md), then pick an issue labeled `good first issue`, `template`, `docs`, or `integration`.
 
 Please keep contributions aligned with the core rule: implement capabilities once in shared package code, then expose them through thin app/API/CLI/MCP/job surfaces.
+
+Default CI runs the fast generator test suite. The heavier generated-app smoke workflow is available in GitHub Actions as `Generated App Smoke` and runs `npm run test:generated`.
 
 ## License
 

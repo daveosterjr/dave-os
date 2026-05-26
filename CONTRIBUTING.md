@@ -10,10 +10,12 @@ This project is opinionated on purpose. Contributions are welcome when they make
 npm test
 npm run verify
 node bin/create-dave-app.mjs test-app --target-dir /tmp/test-app
-node bin/create-dave-app.mjs --idea "Build a portal for teams to track renewals and trigger reminders" --target-dir /tmp/idea-app
+node bin/create-dave-app.mjs --idea "Build a portal for teams to track renewals and trigger reminders" --target-dir /tmp/idea-app --git
 ```
 
 `npm run verify` runs the factory tests, generates a temporary app, installs it, typechecks it, lints it, builds it, starts it, and checks the public health route.
+
+The default GitHub CI runs `npm test` so PRs get fast feedback. Use the manual `Generated App Smoke` workflow, or run `npm run verify` locally, when changing `templates/next-saas` or generated-app behavior.
 
 ## Project Rules
 
@@ -41,3 +43,4 @@ node bin/create-dave-app.mjs --idea "Build a portal for teams to track renewals 
 - Fill in package-level README files.
 - Add examples for custom auth/settings components.
 - Add typed events and sample Trigger tasks.
+- Improve release and npm publishing automation.

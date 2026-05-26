@@ -39,15 +39,18 @@ test('creates a project and replaces tokens', () => {
   });
 
   const packageJson = JSON.parse(fs.readFileSync(path.join(targetDir, 'package.json'), 'utf8'));
+  const packageLock = fs.readFileSync(path.join(targetDir, 'package-lock.json'), 'utf8');
+  const envLocal = fs.readFileSync(path.join(targetDir, '.env.local'), 'utf8');
   const readme = fs.readFileSync(path.join(targetDir, 'README.md'), 'utf8');
   const apiPackage = JSON.parse(fs.readFileSync(path.join(targetDir, 'packages/api/package.json'), 'utf8'));
-  const allFiles = listFiles(targetDir)
-    .filter((file) => !file.endsWith('package-lock.json'))
-    .map((file) => fs.readFileSync(file, 'utf8'));
+  const allFiles = listFiles(targetDir).map((file) => fs.readFileSync(file, 'utf8'));
 
   assert.equal(packageJson.name, 'orbit-desk');
   assert.equal(packageJson.description, 'A desk for orbit work.');
   assert.equal(apiPackage.name, '@orbit/api');
+  assert.match(packageLock, /"name": "orbit-desk"/);
+  assert.match(packageLock, /node_modules\/@orbit\/api/);
+  assert.match(envLocal, /NEXT_PUBLIC_APP_NAME="Orbit Desk"/);
   assert.match(readme, /# Orbit Desk/);
   assert.ok(allFiles.every((content) => !content.includes('__APP_')));
   assert.ok(allFiles.every((content) => !content.includes('workspace:*')));
@@ -146,6 +149,51 @@ test('summarizes long comma-heavy ideas cleanly', () => {
     briefJson.summary,
     'Build a vendor operations SaaS for property managers to import maintenance requests, classify urgent repairs with AI, assign vendors, show realtime job status.'
   );
+});
+
+test('can skip .env.local creation', () => {
+  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'dave-os-no-env-test-'));
+  const targetDir = path.join(tempRoot, 'no-env-created');
+
+  execFileSync(process.execPath, [
+    cli,
+    'No Env App',
+    '--target-dir',
+    targetDir,
+    '--no-env'
+  ], {
+    cwd: repoRoot,
+    encoding: 'utf8'
+  });
+
+  assert.equal(fs.existsSync(path.join(targetDir, '.env.example')), true);
+  assert.equal(fs.existsSync(path.join(targetDir, '.env.local')), false);
+});
+
+test('can initialize a git repository', () => {
+  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'dave-os-git-test-'));
+  const targetDir = path.join(tempRoot, 'git-created');
+
+  execFileSync(process.execPath, [
+    cli,
+    'Git Ready',
+    '--target-dir',
+    targetDir,
+    '--git'
+  ], {
+    cwd: repoRoot,
+    encoding: 'utf8'
+  });
+
+  const insideWorkTree = execFileSync('git', ['-C', targetDir, 'rev-parse', '--is-inside-work-tree'], {
+    encoding: 'utf8'
+  }).trim();
+  const branch = execFileSync('git', ['-C', targetDir, 'branch', '--show-current'], {
+    encoding: 'utf8'
+  }).trim();
+
+  assert.equal(insideWorkTree, 'true');
+  assert.equal(branch, 'main');
 });
 
 function listFiles(root) {
