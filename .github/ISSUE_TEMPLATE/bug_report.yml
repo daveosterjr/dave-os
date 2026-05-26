@@ -1,0 +1,37 @@
+name: Bug report
+description: Report something broken in the factory or generated app.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What broke?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Include exact commands and relevant output.
+      placeholder: |
+        node bin/create-dave-app.mjs my-app
+        cd my-app
+        npm install
+    validations:
+      required: true
+  - type: input
+    id: node
+    attributes:
+      label: Node version
+      placeholder: "v22.x"
+  - type: input
+    id: npm
+    attributes:
+      label: npm version
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context

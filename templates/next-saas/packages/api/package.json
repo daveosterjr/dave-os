@@ -1,0 +1,22 @@
+{
+  "name": "@__APP_SCOPE__/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc --outDir dist --module NodeNext --moduleResolution NodeNext src/index.ts",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@__APP_SCOPE__/shared": "*",
+    "@hono/node-server": "latest",
+    "hono": "latest",
+    "@hono/zod-openapi": "latest",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.22.3",
+    "typescript": "latest"
+  }
+}

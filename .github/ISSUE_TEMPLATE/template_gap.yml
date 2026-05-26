@@ -1,0 +1,23 @@
+name: Template gap
+description: Something the generated app should include or wire better.
+title: "[Template]: "
+labels:
+  - template
+body:
+  - type: textarea
+    id: gap
+    attributes:
+      label: Gap
+      description: What is missing or too stubby in the generated app?
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: Reference pattern
+      description: Link or describe the project/pattern this should copy.
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: How do we know this is done?

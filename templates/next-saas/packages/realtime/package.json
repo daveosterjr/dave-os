@@ -1,0 +1,14 @@
+{
+  "name": "@__APP_SCOPE__/realtime",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./events": "./src/events.ts",
+    "./pusher": "./src/pusher.ts"
+  },
+  "dependencies": {
+    "@__APP_SCOPE__/types": "*",
+    "pusher": "^5.3.3"
+  }
+}

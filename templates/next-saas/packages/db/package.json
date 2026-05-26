@@ -1,0 +1,12 @@
+{
+  "name": "@__APP_SCOPE__/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/client.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.3"
+  }
+}

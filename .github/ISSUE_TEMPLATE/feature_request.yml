@@ -1,0 +1,37 @@
+name: Feature request
+description: Suggest a new factory or template capability.
+title: "[Feature]: "
+labels:
+  - needs decision
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What repeated app-building pain does this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: What should Dave OS generate or do?
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - CLI
+        - Template
+        - Docs
+        - Auth
+        - Billing
+        - Database
+        - Realtime
+        - Jobs
+        - API/CLI/MCP
+        - QA/tests
+    validations:
+      required: true

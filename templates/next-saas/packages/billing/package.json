@@ -1,0 +1,15 @@
+{
+  "name": "@__APP_SCOPE__/billing",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./plans": "./src/plans.ts",
+    "./stripe": "./src/stripe.ts",
+    "./webhook": "./src/webhook.ts"
+  },
+  "dependencies": {
+    "@__APP_SCOPE__/db": "*",
+    "stripe": "^22.1.1"
+  }
+}

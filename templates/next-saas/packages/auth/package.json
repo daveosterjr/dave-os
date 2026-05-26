@@ -1,0 +1,15 @@
+{
+  "name": "@__APP_SCOPE__/auth",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./server": "./src/server.ts",
+    "./workspace": "./src/workspace.ts",
+    "./bearer": "./src/bearer.ts"
+  },
+  "dependencies": {
+    "@clerk/nextjs": "latest",
+    "@__APP_SCOPE__/db": "*"
+  }
+}

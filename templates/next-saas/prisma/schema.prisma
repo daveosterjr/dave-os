@@ -1,0 +1,146 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                    String                 @id @default(cuid())
+  clerkUserId           String                 @unique
+  email                 String                 @unique
+  name                  String?
+  imageUrl              String?
+  defaultOrganizationId String?
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+
+  defaultOrganization Organization?        @relation("DefaultOrganization", fields: [defaultOrganizationId], references: [id], onDelete: SetNull)
+  memberships         OrganizationMember[]
+  apiKeys             ApiKey[]
+}
+
+model Organization {
+  id               String   @id @default(cuid())
+  clerkOrgId       String   @unique
+  name             String
+  slug             String?
+  imageUrl         String?
+  partitionKey     String   @unique @default(uuid())
+  stripeCustomerId String?  @unique
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  defaultForUsers User[]               @relation("DefaultOrganization")
+  members         OrganizationMember[]
+  apiKeys         ApiKey[]
+  subscriptions   StripeSubscription[]
+  stripeEvents    StripeEventLog[]
+  webhookEvents   WebhookEvent[]
+  jobRuns         JobRun[]
+}
+
+model OrganizationMember {
+  id                   String   @id @default(cuid())
+  organizationId       String
+  userId               String
+  clerkMembershipId    String?  @unique
+  role                 String
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+  @@index([userId])
+}
+
+model ApiKey {
+  id             String    @id @default(cuid())
+  organizationId String
+  userId         String?
+  name           String
+  prefix         String
+  hash           String
+  scopes         String[]
+  lastUsedAt     DateTime?
+  revokedAt      DateTime?
+  createdAt      DateTime  @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId])
+  @@index([prefix])
+}
+
+model StripeSubscription {
+  id                   String    @id @default(cuid())
+  organizationId       String
+  stripeSubscriptionId String    @unique
+  stripeCustomerId     String
+  stripePriceId        String?
+  status               String
+  quantity             Int       @default(1)
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean   @default(false)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, status])
+  @@index([stripeCustomerId])
+}
+
+model StripeEventLog {
+  id             String    @id @default(cuid())
+  stripeEventId  String    @unique
+  organizationId String?
+  eventType      String
+  status         String    @default("received")
+  payload        Json
+  processedAt    DateTime?
+  error          String?
+  createdAt      DateTime  @default(now())
+
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId])
+  @@index([eventType])
+}
+
+model WebhookEvent {
+  id             String   @id @default(cuid())
+  organizationId String
+  eventType      String
+  payload        Json
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, eventType])
+}
+
+model JobRun {
+  id             String    @id @default(cuid())
+  organizationId String?
+  taskId         String
+  idempotencyKey String?   @unique
+  status         String
+  payload        Json?
+  result         Json?
+  error          String?
+  startedAt      DateTime?
+  completedAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, taskId])
+  @@index([status])
+}
