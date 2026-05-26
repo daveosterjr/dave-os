@@ -10,13 +10,13 @@
   },
   "dependencies": {
     "@__APP_SCOPE__/shared": "*",
-    "@hono/node-server": "latest",
-    "hono": "latest",
-    "@hono/zod-openapi": "latest",
+    "@hono/node-server": "^2.0.4",
+    "@hono/zod-openapi": "*",
+    "hono": "*",
     "zod": "^4.0.0"
   },
   "devDependencies": {
     "tsx": "^4.22.3",
-    "typescript": "latest"
+    "typescript": "*"
   }
 }
