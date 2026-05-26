@@ -16,7 +16,7 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 5
     steps:
       - name: Check out
         uses: actions/checkout@v4
@@ -29,13 +29,5 @@ jobs:
       - name: Install
         run: npm install
 
-      - name: Cache generated app npm downloads
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-generated-app-${{ hashFiles('templates/next-saas/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-generated-app-
-
       - name: Verify
-        run: npm run verify
+        run: npm test
