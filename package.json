@@ -32,7 +32,7 @@
   },
   "scripts": {
     "test": "node --test tests/*.test.mjs",
-    "test:generated": "rm -rf /tmp/dave-os-ci-app && node bin/create-dave-app.mjs ci-app --target-dir /tmp/dave-os-ci-app && (cd /tmp/dave-os-ci-app && npm install && npm run typecheck && npm run lint && npm run build) && node tests/smoke-generated-server.mjs /tmp/dave-os-ci-app",
+    "test:generated": "rm -rf /tmp/dave-os-ci-app && node bin/create-dave-app.mjs ci-app --target-dir /tmp/dave-os-ci-app && (cd /tmp/dave-os-ci-app && npm ci --prefer-offline --no-audit && npm run typecheck && npm run lint && npm run build) && node tests/smoke-generated-server.mjs /tmp/dave-os-ci-app",
     "verify": "npm test && npm run test:generated",
     "factory:dry": "node bin/create-dave-app.mjs demo-app --dry-run",
     "factory:create": "node bin/create-dave-app.mjs",
